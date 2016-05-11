@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         mSensorManager.unregisterListener(this);
-        mSensorManager.registerListener(this, mSensor, 100000);
+        mSensorManager.registerListener(this, mSensor, seekBar.getProgress());
     }
 
     @Override
