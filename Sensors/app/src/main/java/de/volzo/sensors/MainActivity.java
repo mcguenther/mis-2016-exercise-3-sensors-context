@@ -28,11 +28,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private static FFT FFFobject = new FFT(32);
 
-    private static final int QUEUE_SIZE = 30;
+    private static final int QUEUE_SIZE = 512;
     public CircularFifoQueue<Double> x = new CircularFifoQueue<Double>(QUEUE_SIZE);
     public CircularFifoQueue<Double> y = new CircularFifoQueue<Double>(QUEUE_SIZE);
     public CircularFifoQueue<Double> z = new CircularFifoQueue<Double>(QUEUE_SIZE);
     public CircularFifoQueue<Double> m = new CircularFifoQueue<Double>(QUEUE_SIZE);
+
+    public Double[] ax = new Double[QUEUE_SIZE];
+    public Double[] ay = new Double[QUEUE_SIZE];
+    public Double[] az = new Double[QUEUE_SIZE];
+    public Double[] am = new Double[QUEUE_SIZE];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +86,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         y.add((double) event.values[1]);
         z.add((double) event.values[2]);
         m.add(Math.sqrt(Math.pow(event.values[0], 2) + Math.pow(event.values[1], 2) + Math.pow(event.values[2], 2)));
+
+        x.toArray(ax);
+        y.toArray(ay);
+        z.toArray(az);
+        m.toArray(am);
 
         View view = (AccelView) findViewById(R.id.view);
         view.invalidate();
