@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,10 +27,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static FFT FFFobject = new FFT(32);
 
     private static final int QUEUE_SIZE = 300;
-    private CircularFifoQueue<Double> x = new CircularFifoQueue<Double>(QUEUE_SIZE);
-    private CircularFifoQueue<Double> y = new CircularFifoQueue<Double>(QUEUE_SIZE);
-    private CircularFifoQueue<Double> z = new CircularFifoQueue<Double>(QUEUE_SIZE);
-    private CircularFifoQueue<Double> m = new CircularFifoQueue<Double>(QUEUE_SIZE);
+    public CircularFifoQueue<Double> x = new CircularFifoQueue<Double>(QUEUE_SIZE);
+    public CircularFifoQueue<Double> y = new CircularFifoQueue<Double>(QUEUE_SIZE);
+    public CircularFifoQueue<Double> z = new CircularFifoQueue<Double>(QUEUE_SIZE);
+    public CircularFifoQueue<Double> m = new CircularFifoQueue<Double>(QUEUE_SIZE);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         z.add((double) event.values[2]);
         m.add(Math.sqrt(Math.pow(event.values[0], 2) + Math.pow(event.values[1], 2) + Math.pow(event.values[2], 2)));
 
+        View view = (AccelView) findViewById(R.id.view);
         view.invalidate();
     }
 
