@@ -13,7 +13,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -82,6 +84,36 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         View view = (AccelView) findViewById(R.id.view);
         view.invalidate();
+
+        double mCalc = 7;
+        int nCalc = (int) Math.round(Math.pow(2, mCalc));
+        int noElements = x.size();
+        FFT myFFT = new FFT(nCalc);
+        if (noElements >= nCalc) {
+            Double[] xArrayRealObjects = new Double[noElements];
+            Double[] yArrayRealObjects = new Double[noElements];
+            Double[] zArrayRealObjects = new Double[noElements];
+            Double[] mArrayRealObjects = new Double[noElements];
+            double[] xArrayImag = new double[noElements];
+            double[] yArrayImag = new double[noElements];
+            double[] zArrayImag = new double[noElements];
+            double[] mArrayImag = new double[noElements];
+
+            double[] xArrayReal = ArrayUtils.toPrimitive(x.toArray(xArrayRealObjects));
+            double[] yArrayReal = ArrayUtils.toPrimitive(y.toArray(yArrayRealObjects));
+            double[] zArrayReal = ArrayUtils.toPrimitive(z.toArray(zArrayRealObjects));
+            double[] mArrayReal = ArrayUtils.toPrimitive(m.toArray(mArrayRealObjects));
+
+            //ArrayUtils.toPrimitive(xArrayImag);
+
+            Log.d(TAG, "Calculating FFT with - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
+            myFFT.fft(xArrayReal, xArrayImag);
+            myFFT.fft(yArrayReal, yArrayImag);
+            myFFT.fft(zArrayReal, zArrayImag);
+            myFFT.fft(mArrayReal, mArrayImag);
+
+            Log.d(TAG, "Got FFT - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
+        }
     }
 
     @Override
