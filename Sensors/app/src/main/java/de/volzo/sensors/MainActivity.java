@@ -120,13 +120,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             //ArrayUtils.toPrimitive(xArrayImag);
 
-            Log.d(TAG, "Calculating FFT with - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
+            //Log.d(TAG, "Calculating FFT with - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
             FFFobject.fft(xArrayReal, xArrayImag);
             FFFobject.fft(yArrayReal, yArrayImag);
             FFFobject.fft(zArrayReal, zArrayImag);
             FFFobject.fft(mArrayReal, mArrayImag);
 
-            Log.d(TAG, "Got FFT - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
+            //Log.d(TAG, "Got FFT - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
         }
     }
 
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(seekBar.getId() == R.id.seekBar) {
             mSensorManager.unregisterListener(this);
             int freq = (seekBar.getProgress() + 1) * 10;
-            mSensorManager.registerListener(this, mSensor, seekBar.getProgress());
+            mSensorManager.registerListener(this, mSensor, freq);
         }
     }
 
