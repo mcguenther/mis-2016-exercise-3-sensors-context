@@ -8,6 +8,11 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
 /**
  * Created by Johannes on 11.05.2016.
  */
@@ -31,40 +36,51 @@ public class AccelView extends View {
             try {
                 main = (MainActivity) context;
                 paint.setColor(Color.RED);
-            } catch (ClassCastException ce) {
+            } catch (Exception ce) {
                 return;
             }
         }
-
-        // draw graph here.
+        
         int height = canvas.getHeight();
         int width = canvas.getWidth();
         int elements = main.x.size();
 
         if (elements == 0) {
-            System.out.println(elements);
             return;
         }
 
-        int step = width/elements;
+        int fractionHeight = height / 4;
 
-        Double[] x = new Double[elements];
-        Double[] y = new Double[elements];
-        Double[] z = new Double[elements];
-        Double[] m = new Double[elements];
-        main.x.toArray(x);
-        main.y.toArray(y);
-        main.z.toArray(z);
-        main.m.toArray(m);
+        drawLine(canvas, 0, width, fractionHeight * 0, fractionHeight * 1, main.x);
+        drawLine(canvas, 0, width, fractionHeight * 1, fractionHeight * 2, main.y);
+        drawLine(canvas, 0, width, fractionHeight * 2, fractionHeight * 3, main.z);
+        drawLine(canvas, 0, width, fractionHeight * 3, fractionHeight * 4, main.m);
 
-        float lastX = 0;
-        float lastY = 0;
+    }
 
-        for (int i = 0; i < x.length; i++) {
+    private void drawLine(Canvas canvas, int x1, int x2, int y1, int y2, CircularFifoQueue<Double> values) {
+        Double[] v = new Double[values.size()];
+        values.toArray(v);
+
+        float min = (float) (double) Collections.min(values);
+        float max = (float) (double) Collections.max(values);
+
+        int offset = (y2 - y1) / 2;
+
+        float lastX = x1;
+        float lastY = y1 + offset;
+
+        int step = (x2 - x1) / v.length;
+
+        for (int i = 0; i < v.length; i++) {
             float vX = i * step;
-            float vY = (float) (double) x[i];
+            float vY = (float) (double) v[i];
 
-            canvas.drawLine(lastX, lastY, i*step, (float) (double) x[i], paint);
+            // normalize
+            vY = (vY - min) / (max - min);
+            vY = vY * (y2 - y1) + y1;
+
+            canvas.drawLine(lastX, lastY, vX, vY, paint);
 
             lastX = vX;
             lastY = vY;

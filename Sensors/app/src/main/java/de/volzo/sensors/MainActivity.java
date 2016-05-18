@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private static FFT FFFobject = new FFT(32);
 
-    private static final int QUEUE_SIZE = 300;
+    private static final int QUEUE_SIZE = 30;
     public CircularFifoQueue<Double> x = new CircularFifoQueue<Double>(QUEUE_SIZE);
     public CircularFifoQueue<Double> y = new CircularFifoQueue<Double>(QUEUE_SIZE);
     public CircularFifoQueue<Double> z = new CircularFifoQueue<Double>(QUEUE_SIZE);
