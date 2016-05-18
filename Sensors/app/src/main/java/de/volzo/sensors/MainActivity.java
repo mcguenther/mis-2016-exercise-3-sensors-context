@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor mSensor;
     private static final String TAG = "MainActivity";
 
-    private static FFT FFFobject = new FFT(32);
+    private static FFT FFFobject = new FFT(8);
 
     private static final int QUEUE_SIZE = 30;
     public CircularFifoQueue<Double> x = new CircularFifoQueue<Double>(QUEUE_SIZE);
@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         SeekBar sBar = (SeekBar) findViewById(R.id.seekBar);
         sBar.setOnSeekBarChangeListener(this);
+
+        SeekBar sbFFTSize = (SeekBar) findViewById(R.id.sbFFTSize);
+        sbFFTSize.setOnSeekBarChangeListener(this);
     }
 
     protected void onResume() {
@@ -88,7 +91,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double mCalc = 7;
         int nCalc = (int) Math.round(Math.pow(2, mCalc));
         int noElements = x.size();
-        FFT myFFT = new FFT(nCalc);
+
+
         if (noElements >= nCalc) {
             Double[] xArrayRealObjects = new Double[noElements];
             Double[] yArrayRealObjects = new Double[noElements];
@@ -107,10 +111,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //ArrayUtils.toPrimitive(xArrayImag);
 
             Log.d(TAG, "Calculating FFT with - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
-            myFFT.fft(xArrayReal, xArrayImag);
-            myFFT.fft(yArrayReal, yArrayImag);
-            myFFT.fft(zArrayReal, zArrayImag);
-            myFFT.fft(mArrayReal, mArrayImag);
+            FFFobject.fft(xArrayReal, xArrayImag);
+            FFFobject.fft(yArrayReal, yArrayImag);
+            FFFobject.fft(zArrayReal, zArrayImag);
+            FFFobject.fft(mArrayReal, mArrayImag);
 
             Log.d(TAG, "Got FFT - REAL: " + xArrayReal[0] + " IMAG: " + xArrayImag[0]);
         }
@@ -118,8 +122,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        mSensorManager.unregisterListener(this);
-        mSensorManager.registerListener(this, mSensor, seekBar.getProgress());
+        if(seekBar.getId() == R.id.seekBar) {
+            mSensorManager.unregisterListener(this);
+            int freq = (seekBar.getProgress() + 1) * 10;
+            mSensorManager.registerListener(this, mSensor, seekBar.getProgress());
+        }
     }
 
     @Override
@@ -128,9 +135,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        int freq = (progress + 1) * 10;
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText("Update Accelerometer data every " + freq + "ms.");
+        if(seekBar.getId() == R.id.seekBar) {
+            int freq = (progress + 1) * 10;
+            TextView textView = (TextView) findViewById(R.id.textView);
+            textView.setText("Update Accelerometer data every " + freq + "ms.");
+        }  if(seekBar.getId() == R.id.sbFFTSize) {
+            int freq = progress + 1;
+            updateFFTSize(freq);
+        }
     }
 
+    private void updateFFTSize(int size) {
+        TextView textView = (TextView) findViewById(R.id.tvFFTSize);
+        textView.setText("Use FFT size of " + size + ".");
+        FFFobject = new FFT((int) Math.round(Math.pow(2, size)));
+    }
 }

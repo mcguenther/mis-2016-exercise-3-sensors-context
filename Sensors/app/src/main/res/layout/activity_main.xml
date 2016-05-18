@@ -20,10 +20,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/seekBar"
         android:layout_below="@+id/textView"
-        android:layout_alignParentStart="true"
         android:max="99"
         android:indeterminate="false"
-        android:progress="49" />
+        android:progress="49"
+        android:layout_toEndOf="@+id/textView2" />
 
     <de.volzo.sensors.AccelView
         android:layout_width="fill_parent"
@@ -33,5 +33,38 @@
         android:layout_below="@+id/seekBar"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_above="@+id/tvFFTSize" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update rate"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FFT size"
+        android:id="@+id/textView3"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <SeekBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sbFFTSize"
+        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@+id/view"
+        android:layout_alignStart="@+id/seekBar"
+        android:max="9" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FFT size is displayed here"
+        android:id="@+id/tvFFTSize"
+        android:layout_above="@+id/sbFFTSize"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
