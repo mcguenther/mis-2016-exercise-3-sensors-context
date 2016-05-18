@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor mSensor;
     private static final String TAG = "MainActivity";
 
-    private static FFT FFFobject = new FFT(8);
+    private static FFT FFFobject = null;
 
     private static final int QUEUE_SIZE = 512;
     public CircularFifoQueue<Double> x = new CircularFifoQueue<Double>(QUEUE_SIZE);
@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        updateFFTSize(32);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
