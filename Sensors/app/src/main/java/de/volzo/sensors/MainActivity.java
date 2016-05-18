@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         y.add((double) event.values[1]);
         z.add((double) event.values[2]);
         m.add(Math.sqrt(Math.pow(event.values[0], 2) + Math.pow(event.values[1], 2) + Math.pow(event.values[2], 2)));
+
+        view.invalidate();
     }
 
     @Override

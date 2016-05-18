@@ -17,6 +17,7 @@ public class AccelView extends View {
     @Override
     protected void onDraw (Canvas canvas) {
         // draw graph here.
+        Canvas.draw()
     }
 
     protected void onMeasure (int widthMeasureSpec, int heightMeasureSpec) {
