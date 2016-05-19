@@ -33,26 +33,19 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -123,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 location.getLatitude();
                 speed = location.getSpeed();
                 ((TextView) findViewById(R.id.textView4)).setText("speed: " + speed);
+                fusion.updateGSSpeed(speed);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -154,26 +148,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Updater
 
-        this.fusion = new SensorFusion();
+        this.fusion = new SensorFusion(2* QUEUE_SIZE);
 
         final MainActivity main = this;
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
         scheduler.scheduleAtFixedRate(new Runnable() {
-                    public void run() {
-                        try {
-                            runOnUiThread(new Runnable() {
-                                              @Override
-                                              public void run() {
-                                                  main.updateNotification();
-                                                  // fuck android
-                                              }
-                                          });
-                        } catch (Exception e) {
-                            Log.wtf("runnable", e.toString());
+            public void run() {
+                try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            main.updateNotification();
+                            // fuck android
                         }
-                    }
-                }, 0, 3, TimeUnit.SECONDS);
+                    });
+                } catch (Exception e) {
+                    Log.wtf("runnable", e.toString());
+                }
+            }
+        }, 0, 3, TimeUnit.SECONDS);
     }
 
     public void updateNotification() {
@@ -181,13 +175,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void createNotification(String msg) {
-
         // taken from the android docs
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                                .setSmallIcon(R.drawable.ic_launcher)
-                                .setContentTitle(msg)
-                                .setContentText("");
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle(msg)
+                .setContentText("");
 
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, MainActivity.class);
@@ -202,9 +195,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
-                                0,
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                        );
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
@@ -212,8 +205,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         updateFFTSize(QUEUE_SIZE);
         updateFrequency(0.01);
-
-
     }
 
     protected void onResume() {
@@ -247,14 +238,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         AccelView view = (AccelView) findViewById(R.id.view);
         view.invalidate();
 
-        /*double mCalc = 7;
-        int nCalc = (int) Math.round(Math.pow(2, mCalc));*/
+
         int noElements = x.size();
 
         if (noElements >= this.fftSize) {
             Double[] mArrayRealObjects = new Double[this.fftSize];
             double[] mArrayImag = new double[this.fftSize];
-            double[] mArrayReal = new double[this.fftSize]; //ArrayUtils.toPrimitive(m.toArray(mArrayRealObjects));
+            double[] mArrayReal = new double[this.fftSize];
 
             Iterator<Double> it = m.iterator();
 
@@ -291,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             this.frequency = maxFreq;
             this.magnitude = maxMagn;
+            fusion.updateFrequency(this.frequency);
         }
     }
 
