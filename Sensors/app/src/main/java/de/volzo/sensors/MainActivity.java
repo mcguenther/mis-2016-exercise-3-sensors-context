@@ -35,11 +35,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, SeekBar.OnSeekBarChangeListener {
 
     private SensorManager mSensorManager;
     private Sensor mSensor;
+    private SensorFusion fusion;
+
     private static final String TAG = "MainActivity";
     private static final double FREQ_MS_PER_STEP = 1;
     private static final int FREQ_OFFSET = 1;
@@ -59,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private double frequencyInSeconds;
 
     private int fftSize;
-
 
     private float speed = 0f;
     private double frequency = 0d;
@@ -129,7 +133,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sbFFTSize.setOnSeekBarChangeListener(this);
 
 
-        createNotification("foo");
+        // Updater
+
+        this.fusion = new SensorFusion();
+
+        final MainActivity main = this;
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        scheduler.scheduleAtFixedRate(new Runnable() {
+                    public void run() {
+                        try {
+                            runOnUiThread(new Runnable() {
+                                              @Override
+                                              public void run() {
+                                                  main.updateNotification();
+                                                  // fuck android
+                                              }
+                                          });
+                        } catch (Exception e) {
+                            Log.wtf("runnable", e.toString());
+                        }
+                    }
+                }, 0, 3, TimeUnit.SECONDS);
+    }
+
+    public void updateNotification() {
+        createNotification(fusion.getActivity());
     }
 
     private void createNotification(String msg) {

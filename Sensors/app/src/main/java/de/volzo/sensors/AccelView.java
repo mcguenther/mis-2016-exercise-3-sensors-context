@@ -70,14 +70,15 @@ public class AccelView extends View {
         if (global_max < Collections.max(main.z)) { global_max = (float) (double) Collections.max(main.z); }
         if (global_max < Collections.max(main.m)) { global_max = (float) (double) Collections.max(main.m); }
 
-        drawLine(canvas, 0, width, fractionHeight * 0, fractionHeight * 1, main.ax);
-        drawLine(canvas, 0, width, fractionHeight * 1, fractionHeight * 2, main.ay);
-        drawLine(canvas, 0, width, fractionHeight * 2, fractionHeight * 3, main.az);
-        drawLine(canvas, 0, width, fractionHeight * 3, fractionHeight * 4, main.am);
+        drawLine(canvas, 0, width, fractionHeight * 0, fractionHeight * 1, main.ax, Color.RED);
+        drawLine(canvas, 0, width, fractionHeight * 1, fractionHeight * 2, main.ay, Color.BLUE);
+        drawLine(canvas, 0, width, fractionHeight * 2, fractionHeight * 3, main.az, Color.GREEN);
+        drawLine(canvas, 0, width, fractionHeight * 3, fractionHeight * 4, main.am, Color.BLACK);
 
     }
 
-    private void drawLine(Canvas canvas, int x1, int x2, int y1, int y2, Double[] v) {
+    private void drawLine(Canvas canvas, int x1, int x2, int y1, int y2, Double[] v, int color) {
+        paint.setColor(color);
         int offset = (y2 - y1) / 2;
 
         float lastX = x1;
