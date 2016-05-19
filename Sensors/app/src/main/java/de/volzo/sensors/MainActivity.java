@@ -18,6 +18,9 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public Double[] am = new Double[QUEUE_SIZE];
     private int frequency;
     private int fftSize;
+    private double maxMagn = 0;
+    private int maxFreqI = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
 
         updateFFTSize(QUEUE_SIZE);
-        updateFrequency(500);
+        updateFrequency(500 * 10);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -109,18 +114,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         int noElements = x.size();
 
         if (noElements >= this.fftSize) {
-            Double[] mArrayRealObjects = new Double[noElements];
-            double[] mArrayImag = new double[noElements];
-            double[] mArrayReal = ArrayUtils.toPrimitive(m.toArray(mArrayRealObjects));
-            FFFobject.fft(mArrayReal, mArrayImag);
-            Double[] mFFTMagnitude = new Double[noElements];
+            Double[] mArrayRealObjects = new Double[this.fftSize];
+            double[] mArrayImag = new double[this.fftSize];
+            double[] mArrayReal = new double[this.fftSize]; //ArrayUtils.toPrimitive(m.toArray(mArrayRealObjects));
 
-            for (int i = 0; i < noElements; ++i) {
-                mFFTMagnitude[i] = Math.sqrt(Math.pow(mArrayReal[i], 2) + Math.pow(mArrayImag[i], 2));
+            Iterator<Double> it = m.iterator();
+
+            for(int n = 0; n < this.fftSize; ++n) {
+                mArrayReal[n] = (double) it.next();
             }
+
+            FFFobject.fft(mArrayReal, mArrayImag);
+
+            // only use first half of data owing to symmetry of fft data
+            // in addition drop 0-element which is 0 Hz and could be interpreted as offset
+
+            Double[] mFFTMagnitude = new Double[Math.round(this.fftSize/2)-1];
+            for (int i = 1; i < Math.round(this.fftSize/2); ++i) {
+                double curMagn = Math.sqrt(Math.pow(mArrayReal[i], 2) + Math.pow(mArrayImag[i], 2));
+                if (curMagn > maxMagn) {
+                    maxMagn = curMagn;
+                    maxFreqI = i;
+                }
+                mFFTMagnitude[i-1] = curMagn;
+            }
+
+
+
             FFTView myFFTView = (FFTView) findViewById(R.id.FFTview);
             myFFTView.setMagnitudes(mFFTMagnitude);
+            Log.d(TAG, "Maximum FFT value: " + maxMagn + " at i = " + maxFreqI);
             myFFTView.invalidate();
+
+
         }
     }
 
@@ -128,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onStopTrackingTouch(SeekBar seekBar) {
         if (seekBar.getId() == R.id.seekBar) {
             mSensorManager.unregisterListener(this);
-            int freq = (seekBar.getProgress() + 1) * 10;
+            int freq = (seekBar.getProgress() + 1) * 100;
             mSensorManager.registerListener(this, mSensor, freq);
         }
     }
@@ -140,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (seekBar.getId() == R.id.seekBar) {
-            int freq = (progress + 1) * 10;
+            int freq = (progress + 1) * 100;
             updateFrequency(freq);
         }
         if (seekBar.getId() == R.id.sbFFTSize) {
@@ -151,12 +177,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private void updateFrequency(int freq) {
         TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText("Update Accelerometer data every " + freq + "ms.");
+        textView.setText("Update Accelerometer data every " + freq / 100 + "ms.");
         
         this.frequency = freq;
         
         SeekBar sbF = (SeekBar) findViewById(R.id.seekBar);
-        sbF.setProgress(Math.round((freq / 10) - 1));
+        sbF.setProgress(Math.round((freq / 100) - 1));
     }
 
     private void updateFFTSize(int size) {
