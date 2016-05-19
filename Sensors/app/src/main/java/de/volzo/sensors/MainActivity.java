@@ -279,7 +279,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //tvSize.setText("Found strongest frequency: " + maxFreq);
             myFFTView.invalidate();
 
-            this.frequency = maxFreq;
+            //simple thresholding: assume no acceleration if magnitude is too small (< 10)
+
+
+            if(maxMagn < 10) {
+                this.frequency = 0;
+            } else {
+                this.frequency = maxFreq;
+            }
             this.magnitude = maxMagn;
             fusion.updateFrequency(this.frequency);
         }
