@@ -1,3 +1,22 @@
+/*
+
+Explanation for our sensor usage:
+
+we detect the following activities:
+
+* lying on couch
+* walking
+* cycling
+
+We rely on the GPS speed measurement besides the accelerometer data since we need to differentiate
+between walking and cycling. GPS speed is much more unreliable, more coarse and slow but still
+sufficient for our needs.
+
+We expect a possible overlap between slow cycling and fast walking, but that could be addressed
+by improving our averaging method.
+
+ */
+
 package de.volzo.sensors;
 
 import android.Manifest;
@@ -162,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void createNotification(String msg) {
+
+        // taken from the android docs
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                                 .setSmallIcon(R.drawable.ic_launcher)
                                 .setContentTitle(msg)
