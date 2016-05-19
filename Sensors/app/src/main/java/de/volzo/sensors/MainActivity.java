@@ -1,10 +1,17 @@
 package de.volzo.sensors;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private double maxMagn = 0;
     private int maxFreqI = 0;
 
+    private float speed = 0f;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,8 +77,44 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //}
             }
         } else {
-            Log.i(TAG, "No Accelerometer found, sry.");
+            Log.i(TAG, "No Accelerometer found.");
         }
+
+        // GPS / Speed
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 23);
+        }
+
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        LocationListener locationListener = new LocationListener() {
+
+            public void onLocationChanged(Location location) {
+                location.getLatitude();
+                speed = location.getSpeed();
+                ((TextView) findViewById(R.id.textView4)).setText("speed: " + speed);
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i(TAG, "location status changed: " + status);
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, locationListener);
+        } catch (SecurityException se) {
+            Log.e(TAG, se.toString());
+        }
+
+
+        // Seek bars
 
         SeekBar sBar = (SeekBar) findViewById(R.id.seekBar);
         sBar.setOnSeekBarChangeListener(this);
