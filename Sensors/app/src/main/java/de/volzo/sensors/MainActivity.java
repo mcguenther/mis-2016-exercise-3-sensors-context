@@ -145,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         SeekBar sbFFTSize = (SeekBar) findViewById(R.id.sbFFTSize);
         sbFFTSize.setOnSeekBarChangeListener(this);
 
+        updateFFTSize(QUEUE_SIZE);
+        updateFrequency(0.01);
 
         // Updater
 
@@ -160,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         @Override
                         public void run() {
                             main.updateNotification();
-                            // fuck android
                         }
                     });
                 } catch (Exception e) {
@@ -203,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // mId allows you to update the notification later on.
         mNotificationManager.notify(42, mBuilder.build());
 
-        updateFFTSize(QUEUE_SIZE);
-        updateFrequency(0.01);
     }
 
     protected void onResume() {
